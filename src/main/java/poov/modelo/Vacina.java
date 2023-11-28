@@ -8,8 +8,8 @@ public class Vacina {
     
         public Vacina() {
             codigo = -1L;
-            nome = "Sem nome";
-            descricao = "Sem descrição";
+            nome = "";
+            descricao = "";
         }
         public Vacina(Long codigo, String nome, String descricao) {
             this.codigo = codigo;

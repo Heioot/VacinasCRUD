@@ -41,11 +41,12 @@ public class TelaPrimariaController implements Initializable {
     private Stage stageEditar;
     private Stage stageRemover;
 
-    private TelaSecundariaController telaCriarCadastroController;
+    private TelaSecundariaController telaSecundariaController;
 
     public TelaPrimariaController() {
         System.out.println("TelaPrimariaController criado");
-        ConexaoFactoryPostgreSQL conexao = new ConexaoFactoryPostgreSQL("localhost:5432/vacinascrud", "postgres","heitor6505");
+        ConexaoFactoryPostgreSQL conexao = new ConexaoFactoryPostgreSQL("localhost:5432/vacinascrud", "postgres",
+                "heitor6505");
         factory = new DAOFactory(conexao);
     }
 
@@ -142,8 +143,8 @@ public class TelaPrimariaController implements Initializable {
             alert.showAndWait();
         } else {
             Vacina selected = tabelaVacina.getSelectionModel().getSelectedItem();
-            telaCriarCadastroController.setSelecionado(selected);
-            telaCriarCadastroController.setEditar(true);
+            telaSecundariaController.setSelecionado(selected);
+            telaSecundariaController.setEditar(true);
             if (stageNova.getOwner() == null) {
                 stageNova.initOwner(((Button) event.getSource()).getScene().getWindow());
             }
@@ -154,8 +155,16 @@ public class TelaPrimariaController implements Initializable {
     }
 
     @FXML
-    void novaButtonClick(ActionEvent event) throws IOException {
-        mostrarNovaScene(event, "/fxml/telaSecundaria.fxml");
+    void novaButtonClick(ActionEvent event) throws IOException, SQLException {
+        // mostrarNovaScene(event, "/fxml/telaSecundaria.fxml");
+        telaSecundariaController.setEditar(false);
+        if (stageNova.getOwner() == null) {
+            telaSecundariaController.setTitle("Nova Vacina");
+            telaSecundariaController.setSelecionado(new Vacina());
+            stageNova.initOwner(((Button) event.getSource()).getScene().getWindow());
+        }
+        stageNova.showAndWait();
+        pesquisarVacinaButtonClick(event);
     }
 
     @FXML
@@ -203,9 +212,15 @@ public class TelaPrimariaController implements Initializable {
             alert.setHeaderText("Você deve selecionar alguma vacina!");
             alert.showAndWait();
         } else {
-            Vacina selected = tabelaVacina.getSelectionModel().getSelectedItem();
-            telaCriarCadastroController.setSelecionado(selected);
-            telaCriarCadastroController.setRemover(true);   
+            try {
+                factory.abrirConexao();
+                VacinaDAO dao = factory.getDAO(VacinaDAO.class);
+                Vacina selected = tabelaVacina.getSelectionModel().getSelectedItem();
+                dao.remover(selected);
+            } finally {
+                pesquisarVacinaButtonClick(event);
+                factory.fecharConexao();
+            }
         }
     }
 
@@ -248,8 +263,8 @@ public class TelaPrimariaController implements Initializable {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/fxml/telaSecundaria.fxml"));
         try {
             parent = fxmlLoader.load();
-            telaCriarCadastroController = fxmlLoader.getController();
-            telaCriarCadastroController.setDAOFactory(factory);
+            telaSecundariaController = fxmlLoader.getController();
+            telaSecundariaController.setDAOFactory(factory);
             Scene sceneAlterar = new Scene(parent);
             stageNova.setScene(sceneAlterar);
             stageNova.setTitle("Alterar Vacina");

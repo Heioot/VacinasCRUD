@@ -24,12 +24,13 @@ public class TelaSecundariaController {
 
     private DAOFactory factory;
     private boolean editar;
-    private boolean remover;
+
+
     public void setDAOFactory (DAOFactory factory) {
         this.factory = factory;
     }
-    
-    
+
+
     public void setSelecionado(Vacina selecionado) {
         codigoField.setText(selecionado.getCodigo().toString());
         nomeField.setText(selecionado.getNome());
@@ -72,8 +73,6 @@ public class TelaSecundariaController {
         ButtonType result = alert.showAndWait().orElse(ButtonType.CANCEL);
         if (result == ButtonType.OK) {
             fecharClicado(event);
-            mostrarNovaScene(event, "/fxml/telaPrimaria.fxml");
-
         }
     }
 
@@ -92,6 +91,7 @@ public class TelaSecundariaController {
                 }else{
                     dao.atualizarVacina(vacina);
                 }
+
                 fecharClicado(event);
             }finally {
                 factory.fecharConexao();
@@ -118,8 +118,16 @@ public class TelaSecundariaController {
         stage.setScene(scene);
         stage.show();
     }
+    
     void fecharClicado(ActionEvent event) {
         ((Button) event.getSource()).getScene().getWindow().hide();
 
     }
+
+
+    public void setTitle(String string) {
+        Stage stage = (Stage) confirmarButton.getScene().getWindow();
+        stage.setTitle(string);
+    }
+
 }
