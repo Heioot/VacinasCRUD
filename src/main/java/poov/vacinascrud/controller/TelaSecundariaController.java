@@ -13,6 +13,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import poov.modelo.Vacina;
@@ -41,7 +42,7 @@ public class TelaSecundariaController {
     public void setEditar(boolean editar) {
         this.editar = editar;
         codigoField.setEditable(!editar);
-    
+        codigoField.setDisable(!editar);
     }
 
     public TelaSecundariaController() {
@@ -64,7 +65,6 @@ public class TelaSecundariaController {
 
     @FXML
     private TextField nomeField;
-
     @FXML
     void cancelarButtonClick(ActionEvent event) throws IOException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -105,8 +105,7 @@ public class TelaSecundariaController {
     }
 
     public boolean validaCamposSecundaria() {
-        return !codigoField.getText().isBlank() &&
-                !nomeField.getText().isBlank() &&
+        return  !nomeField.getText().isBlank() &&
                 !descricaoField.getText().isBlank();
     }
 
@@ -129,5 +128,21 @@ public class TelaSecundariaController {
         Stage stage = (Stage) confirmarButton.getScene().getWindow();
         stage.setTitle(string);
     }
+
+
+    public TextField getNomeField() {
+        return nomeField;
+    }
+
+
+    public TextField getDescricaoField() {
+        return descricaoField;
+    }
+
+
+    public TextField getCodigoField() {
+        return codigoField;
+    }
+
 
 }

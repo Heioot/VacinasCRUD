@@ -5,45 +5,67 @@ public class Vacina {
         private Long codigo;
         private String nome;
         private String descricao;
+        private Situacao situacao;
     
         public Vacina() {
             codigo = -1L;
             nome = "";
             descricao = "";
+            situacao = Situacao.ATIVO;
         }
+        
         public Vacina(Long codigo, String nome, String descricao) {
             this.codigo = codigo;
             this.nome = nome;
             this.descricao = descricao;
+            situacao = Situacao.ATIVO;
         }
-    
+
+        public Vacina(Long codigo, String nome, String descricao, Situacao situacao) {
+            this.codigo = codigo;
+            this.nome = nome;
+            this.descricao = descricao;
+            this.situacao = situacao;
+        }
+
         public Long getCodigo() {
             return codigo;
         }
-    
-        public String getNome() {
-            return nome;
-        }
-    
-        public String getDescricao() {
-            return descricao;
-        }
-    
+
         public void setCodigo(Long codigo) {
             this.codigo = codigo;
         }
-    
+
+        public String getNome() {
+            return nome;
+        }
+
         public void setNome(String nome) {
             this.nome = nome;
         }
-    
+
+        public String getDescricao() {
+            return descricao;
+        }
+
         public void setDescricao(String descricao) {
             this.descricao = descricao;
         }
+
+        public Situacao getSituacao() {
+            return situacao;
+        }
+
+        public void setSituacao(Situacao situacao) {
+            this.situacao = situacao;
+        }
+
         @Override
         public String toString() {
-            return "Vacina [codigo=" + codigo + ", nome=" + nome + ", descricao=" + descricao + "]";
+            return "Vacina [codigo=" + codigo + ", nome=" + nome + ", descricao=" + descricao + ", situacao=" + situacao
+                    + "]";
         }
+
         @Override
         public int hashCode() {
             final int prime = 31;
@@ -51,8 +73,10 @@ public class Vacina {
             result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
             result = prime * result + ((nome == null) ? 0 : nome.hashCode());
             result = prime * result + ((descricao == null) ? 0 : descricao.hashCode());
+            result = prime * result + ((situacao == null) ? 0 : situacao.hashCode());
             return result;
         }
+
         @Override
         public boolean equals(Object obj) {
             if (this == obj)
@@ -77,10 +101,10 @@ public class Vacina {
                     return false;
             } else if (!descricao.equals(other.descricao))
                 return false;
+            if (situacao != other.situacao)
+                return false;
             return true;
         }
 
         
-
-    
 }

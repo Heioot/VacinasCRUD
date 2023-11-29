@@ -22,6 +22,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import poov.modelo.Situacao;
 import poov.modelo.Vacina;
 import poov.modelo.dao.ConexaoFactoryPostgreSQL;
 import poov.modelo.dao.VacinaDAO;
@@ -45,8 +46,7 @@ public class TelaPrimariaController implements Initializable {
 
     public TelaPrimariaController() {
         System.out.println("TelaPrimariaController criado");
-        ConexaoFactoryPostgreSQL conexao = new ConexaoFactoryPostgreSQL("localhost:5432/vacinascrud", "postgres",
-                "heitor6505");
+        ConexaoFactoryPostgreSQL conexao = new ConexaoFactoryPostgreSQL("localhost:5432/vacinascrud", "postgres","heitor6505");
         factory = new DAOFactory(conexao);
     }
 
@@ -145,6 +145,8 @@ public class TelaPrimariaController implements Initializable {
             Vacina selected = tabelaVacina.getSelectionModel().getSelectedItem();
             telaSecundariaController.setSelecionado(selected);
             telaSecundariaController.setEditar(true);
+            telaSecundariaController.getCodigoField().setDisable(true);
+
             if (stageNova.getOwner() == null) {
                 stageNova.initOwner(((Button) event.getSource()).getScene().getWindow());
             }
@@ -158,6 +160,10 @@ public class TelaPrimariaController implements Initializable {
     void novaButtonClick(ActionEvent event) throws IOException, SQLException {
         // mostrarNovaScene(event, "/fxml/telaSecundaria.fxml");
         telaSecundariaController.setEditar(false);
+
+
+        telaSecundariaController.getNomeField().setText("AS VEZES ENTRA AQUI");
+        telaSecundariaController.getDescricaoField().setText("AS VEZES ENTRA AQUI");
         if (stageNova.getOwner() == null) {
             telaSecundariaController.setTitle("Nova Vacina");
             telaSecundariaController.setSelecionado(new Vacina());
@@ -174,26 +180,28 @@ public class TelaPrimariaController implements Initializable {
 
     @FXML
     void pesquisarVacinaButtonClick(ActionEvent event) throws SQLException {
-        Vacina filtro = new Vacina();
+        Vacina filtropesquisar = new Vacina();
+        
         if (!codigoVacinaField.getText().isBlank()) {
-            filtro.setCodigo(Long.parseLong(codigoVacinaField.getText()));
+            filtropesquisar.setCodigo(Long.parseLong(codigoVacinaField.getText()));
         } else {
-            filtro.setCodigo(Long.parseLong("0"));
+            filtropesquisar.setCodigo(Long.parseLong("0"));
         }
         if (!nomeVacinaField.getText().isBlank()) {
-            filtro.setNome(nomeVacinaField.getText());
+            filtropesquisar.setNome(nomeVacinaField.getText());
         } else {
-            filtro.setNome(null);
+            filtropesquisar.setNome(null);
         }
         if (!descricaoVacinaField.getText().isBlank()) {
-            filtro.setDescricao(descricaoVacinaField.getText());
+            filtropesquisar.setDescricao(descricaoVacinaField.getText());
         } else {
-            filtro.setDescricao(null);
+            filtropesquisar.setDescricao(null);
         }
+
         try {
             factory.abrirConexao();
             VacinaDAO dao = factory.getDAO(VacinaDAO.class);
-            List<Vacina> vacinas = dao.findbyParameters(filtro.getNome(), filtro.getDescricao(), filtro.getCodigo());
+            List<Vacina> vacinas = dao.findbyParameters(filtropesquisar.getNome(), filtropesquisar.getDescricao(), filtropesquisar.getCodigo(), filtropesquisar.getSituacao());
             tabelaVacina.getItems().clear();
             tabelaVacina.getItems().addAll(vacinas);
             for (Vacina vacina : vacinas) {
@@ -217,10 +225,12 @@ public class TelaPrimariaController implements Initializable {
                 VacinaDAO dao = factory.getDAO(VacinaDAO.class);
                 Vacina selected = tabelaVacina.getSelectionModel().getSelectedItem();
                 dao.remover(selected);
+                tabelaVacina.getItems().addAll(dao.findAll());
+                vacinaTableView();
             } finally {
-                pesquisarVacinaButtonClick(event);
                 factory.fecharConexao();
             }
+
         }
     }
 

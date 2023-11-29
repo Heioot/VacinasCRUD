@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import poov.modelo.Situacao;
 import poov.modelo.Vacina;
 import poov.modelo.dao.core.GenericJDBCDAO;
 
@@ -16,13 +17,13 @@ public class VacinaDAO extends GenericJDBCDAO<Vacina, Long> {
         super(conexao);
     }
     
-    private static final String SQL_QUERY = "SELECT * FROM vacina WHERE nome like ? or descricao like ? or codigo = ?";
-    private static final String FIND_ALL_QUERY = "SELECT codigo, nome, descricao FROM vacina";
+    private static final String SQL_QUERY = "SELECT * FROM vacina WHERE nome like ? or descricao like ? or codigo = ? ";
+    private static final String FIND_ALL_QUERY = "SELECT codigo, nome, descricao FROM vacina WHERE situacao='ATIVO'";
     private static final String FIND_BY_KEY_QUERY = FIND_ALL_QUERY + "where codigo=? ";
     private static final String FIND_BY_NAME_LIKE_QUERY = FIND_ALL_QUERY + "AND upper(nome) like upper(?)";
     private static final String UPDATE_QUERY = "UPDATE vacina SET nome=?, descricao=? WHERE codigo = ?";
-    private static final String CREATE_QUERY = "INSERT INTO vacina (codigo, nome, descricao) VALUES (?, ?, ?)";
-    private static final String REMOVE_QUERY = "DELETE FROM vacina WHERE codigo=?";
+    private static final String CREATE_QUERY = "INSERT INTO vacina (nome, descricao, situacao) VALUES (?, ?, 'ATIVO')";
+    private static final String REMOVE_QUERY = "UPDATE vacina SET situacao = 'INATIVO' WHERE codigo=?";
 
     @Override
     protected Vacina toEntity(ResultSet resultSet) throws SQLException {
@@ -30,16 +31,18 @@ public class VacinaDAO extends GenericJDBCDAO<Vacina, Long> {
         vacina.setCodigo(resultSet.getLong("codigo"));
         vacina.setNome(resultSet.getString("nome"));
         vacina.setDescricao(resultSet.getString("descricao"));
+        if (resultSet.getString("situacao").equals("ATIVO")) {
+            vacina.setSituacao(Situacao.ATIVO);
+        } else {
+            vacina.setSituacao(Situacao.INATIVO);
+        }
         return vacina;
     }
 
     @Override
     protected void addParameters(PreparedStatement pstmt, Vacina entity) throws SQLException {
-        pstmt.setString(2, entity.getNome());
-        pstmt.setString(3, entity.getDescricao());
-        if (entity.getCodigo() != null) {
-            pstmt.setLong(1, entity.getCodigo());
-        }
+        pstmt.setString(1, entity.getNome());
+        pstmt.setString(2, entity.getDescricao());
     }
 
     @Override
@@ -67,8 +70,9 @@ public class VacinaDAO extends GenericJDBCDAO<Vacina, Long> {
         return REMOVE_QUERY;
     }
     
-    public List<Vacina> findbyParameters(String nome, String descricao, long codigo) {
+    public List<Vacina> findbyParameters(String nome, String descricao, long codigo, Situacao situacao) {
         int cursor = 1;
+        situacao = Situacao.ATIVO;
         String query = "SELECT * FROM vacina where codigo is not null";
         try {
             if (nome != null) {
@@ -81,6 +85,9 @@ public class VacinaDAO extends GenericJDBCDAO<Vacina, Long> {
                 query += " and codigo = ?";
             }
 
+            if(situacao == Situacao.ATIVO){
+                query += " and situacao = 'ATIVO'";
+            }
             PreparedStatement statement = connection.prepareStatement(query);
             if (nome != null) {
                 statement.setString(cursor,"%" + nome.toLowerCase() + "%");
@@ -94,7 +101,7 @@ public class VacinaDAO extends GenericJDBCDAO<Vacina, Long> {
                 statement.setLong(cursor,codigo);
                 cursor++;
             }
-            
+
             ResultSet resultSet = statement.executeQuery();
             return toEntityList(resultSet);
         } catch (SQLException e) {

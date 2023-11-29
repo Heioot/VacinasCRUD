@@ -5,18 +5,33 @@ public class Vacina {
     private Long codigo;
     private String nome;
     private String descricao;
-    
+    private Situacao situacao;
 
-    public Vacina () {
-        codigo = 0L;
-        nome = "Sem nome";
-        descricao = "Sem descricao";
+    public Vacina() {
+        codigo = -1L;
+        nome = "AS VEZES ENTRA NESSE CONSTRUTOR AQUI";
+        descricao = "AS VEZES ENTRA NESSE CONSTRUTOR AQUI";
+        situacao = Situacao.ATIVO;
+    }
+
+    public Vacina(String nome, String descricao) {
+        this.nome = nome;
+        this.descricao = descricao;
+        situacao = Situacao.ATIVO;
     }
 
     public Vacina(Long codigo, String nome, String descricao) {
         this.codigo = codigo;
         this.nome = nome;
         this.descricao = descricao;
+        situacao = Situacao.ATIVO;
+    }
+
+    public Vacina(Long codigo, String nome, String descricao, Situacao situacao) {
+        this.codigo = codigo;
+        this.nome = nome;
+        this.descricao = descricao;
+        this.situacao = situacao;
     }
 
     public Long getCodigo() {
@@ -43,9 +58,18 @@ public class Vacina {
         this.descricao = descricao;
     }
 
+    public Situacao getSituacao() {
+        return situacao;
+    }
+
+    public void setSituacao(Situacao situacao) {
+        this.situacao = situacao;
+    }
+
     @Override
     public String toString() {
-        return "Vacina [codigo=" + codigo + ", nome=" + nome + ", descricao=" + descricao + "]";
+        return "codigo: " + codigo + "\nnome: " + nome + "\ndescricao: " + descricao + "\nsituacao: "
+                + situacao.getDescricao();
     }
 
     @Override
@@ -55,6 +79,7 @@ public class Vacina {
         result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
         result = prime * result + ((nome == null) ? 0 : nome.hashCode());
         result = prime * result + ((descricao == null) ? 0 : descricao.hashCode());
+        result = prime * result + ((situacao == null) ? 0 : situacao.hashCode());
         return result;
     }
 
@@ -82,9 +107,9 @@ public class Vacina {
                 return false;
         } else if (!descricao.equals(other.descricao))
             return false;
+        if (situacao != other.situacao)
+            return false;
         return true;
     }
 
-    
-    
 }
