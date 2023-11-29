@@ -9,11 +9,11 @@ public class ConexaoBanco {
     public static void main(String[] args) {
 
         String caminho = "jdbc:postgresql";
-        String host = "localhost";
+        String host = "silly.db.elephantsql.com";
         String porta = "5432";
-        String bd = "poov";
-        String login = "postgres";
-        String senha = "heitor6505";
+        String bd = "tplykbkp";
+        String login = "tplykbkp";
+        String senha = "yln0n1q5zcgZ3K58NWXeG2N2Gvl2MRKR";
         String url = caminho + "://" + host + ":" + porta + "/" + bd;
         String classeDriver = "org.postgresql.Driver";
         Connection conexao = null;

@@ -1,11 +1,15 @@
 package poov.vacinascrud.controller;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,26 +20,41 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import poov.modelo.Situacao;
 import poov.modelo.Vacina;
 import poov.modelo.dao.ConexaoFactoryPostgreSQL;
 import poov.modelo.dao.VacinaDAO;
 import poov.modelo.dao.core.DAOFactory;
 
-public class TelaSecundariaController {
+public class TelaSecundariaController implements Initializable{
 
     private DAOFactory factory;
     private boolean editar;
-
+    public void initialize(URL location, ResourceBundle resources){
+        codigoField.setEditable(false);
+    }
 
     public void setDAOFactory (DAOFactory factory) {
         this.factory = factory;
     }
 
 
-    public void setSelecionado(Vacina selecionado) {
+    public void setSelecionado(Vacina selecionado) throws SQLException{
         codigoField.setText(selecionado.getCodigo().toString());
         nomeField.setText(selecionado.getNome());
         descricaoField.setText(selecionado.getDescricao());
+        if(!editar){
+            Long cod = Long.parseLong("0");
+            try {
+                factory.abrirConexao();
+                VacinaDAO dao = factory.getDAO(VacinaDAO.class);
+                List<Vacina> vacinas = dao.findAll();
+                cod = vacinas.get(vacinas.size()-1).getCodigo()+Long.parseLong("1");
+            } finally {
+                factory.fecharConexao();
+            }
+            codigoField.setText(cod.toString());
+        }
     }
 
 
@@ -47,7 +66,7 @@ public class TelaSecundariaController {
 
     public TelaSecundariaController() {
         System.out.println("TelaSecundariaController criado");
-        ConexaoFactoryPostgreSQL conexao = new ConexaoFactoryPostgreSQL("localhost:5432/vacinascrud", "postgres","heitor6505");
+        ConexaoFactoryPostgreSQL conexao = new ConexaoFactoryPostgreSQL("silly.db.elephantsql.com:5432/tplykbkp", "tplykbkp","yln0n1q5zcgZ3K58NWXeG2N2Gvl2MRKR");
         factory = new DAOFactory(conexao);
     }
 
@@ -87,7 +106,7 @@ public class TelaSecundariaController {
                 vacina.setNome(nomeField.getText());
                 vacina.setDescricao(descricaoField.getText());
                 if(!editar){
-                    dao.create(vacina);
+                    dao.inserirVacina(vacina);
                 }else{
                     dao.atualizarVacina(vacina);
                 }

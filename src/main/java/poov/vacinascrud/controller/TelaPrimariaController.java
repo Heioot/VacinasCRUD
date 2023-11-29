@@ -46,7 +46,7 @@ public class TelaPrimariaController implements Initializable {
 
     public TelaPrimariaController() {
         System.out.println("TelaPrimariaController criado");
-        ConexaoFactoryPostgreSQL conexao = new ConexaoFactoryPostgreSQL("localhost:5432/vacinascrud", "postgres","heitor6505");
+        ConexaoFactoryPostgreSQL conexao = new ConexaoFactoryPostgreSQL("silly.db.elephantsql.com:5432/tplykbkp", "tplykbkp","yln0n1q5zcgZ3K58NWXeG2N2Gvl2MRKR");
         factory = new DAOFactory(conexao);
     }
 
@@ -143,9 +143,8 @@ public class TelaPrimariaController implements Initializable {
             alert.showAndWait();
         } else {
             Vacina selected = tabelaVacina.getSelectionModel().getSelectedItem();
-            telaSecundariaController.setSelecionado(selected);
             telaSecundariaController.setEditar(true);
-            telaSecundariaController.getCodigoField().setDisable(true);
+            telaSecundariaController.setSelecionado(selected);
 
             if (stageNova.getOwner() == null) {
                 stageNova.initOwner(((Button) event.getSource()).getScene().getWindow());
@@ -160,10 +159,7 @@ public class TelaPrimariaController implements Initializable {
     void novaButtonClick(ActionEvent event) throws IOException, SQLException {
         // mostrarNovaScene(event, "/fxml/telaSecundaria.fxml");
         telaSecundariaController.setEditar(false);
-
-
-        telaSecundariaController.getNomeField().setText("AS VEZES ENTRA AQUI");
-        telaSecundariaController.getDescricaoField().setText("AS VEZES ENTRA AQUI");
+        telaSecundariaController.setSelecionado(new Vacina());
         if (stageNova.getOwner() == null) {
             telaSecundariaController.setTitle("Nova Vacina");
             telaSecundariaController.setSelecionado(new Vacina());
@@ -211,6 +207,18 @@ public class TelaPrimariaController implements Initializable {
             factory.fecharConexao();
         }
     }
+    public void inicializarTableVacina() throws SQLException{
+        try {
+            factory.abrirConexao();
+            VacinaDAO dao = factory.getDAO(VacinaDAO.class);
+            List<Vacina> vacinas = dao.findbyParameters(null, null, 0, Situacao.ATIVO);
+            tabelaVacina.getItems().clear();
+            tabelaVacina.getItems().addAll(vacinas);
+        } finally {
+            factory.fecharConexao();
+        }
+
+    }
 
     @FXML
     void removerButtonClick(ActionEvent event) throws IOException, SQLException {
@@ -225,8 +233,8 @@ public class TelaPrimariaController implements Initializable {
                 VacinaDAO dao = factory.getDAO(VacinaDAO.class);
                 Vacina selected = tabelaVacina.getSelectionModel().getSelectedItem();
                 dao.remover(selected);
-                tabelaVacina.getItems().addAll(dao.findAll());
-                vacinaTableView();
+                tabelaVacina.getItems().clear();
+                tabelaVacina.getItems().addAll(dao.findbyParameters(null, null, 0, Situacao.ATIVO));
             } finally {
                 factory.fecharConexao();
             }
@@ -257,16 +265,7 @@ public class TelaPrimariaController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-        try {
-            factory.abrirConexao();
-            VacinaDAO dao = factory.getDAO(VacinaDAO.class);
-            tabelaVacina.getItems().addAll(dao.findAll());
-            vacinaTableView();
-        } catch (SQLException e) {
-        } finally {
-            factory.fecharConexao();
-        }
+        vacinaTableView();
 
         Parent parent;
         stageNova = new Stage();
@@ -287,7 +286,12 @@ public class TelaPrimariaController implements Initializable {
             alert.setContentText("Erro carregando a aplicação!");
             alert.showAndWait();
         }
+        try{
 
+            inicializarTableVacina();
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
     }
 
     public boolean validaCamposSecundaria() {

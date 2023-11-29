@@ -79,7 +79,7 @@ public class VacinaDAO extends GenericJDBCDAO<Vacina, Long> {
                 query += " and LOWER(nome) like ?";
             }
             if (descricao != null) {
-                query += " and descricao  like ?";
+                query += " and LOWER(descricao)  like ?";
             }
             if(codigo != 0){
                 query += " and codigo = ?";
@@ -135,7 +135,7 @@ public class VacinaDAO extends GenericJDBCDAO<Vacina, Long> {
 
         public List<Vacina> findAll() {
         try {
-            PreparedStatement statement = connection.prepareStatement(findAllQuery());
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM Vacina");
             ResultSet resultSet = statement.executeQuery();
             return toEntityList(resultSet);
         } catch (SQLException e) {
@@ -157,6 +157,17 @@ public class VacinaDAO extends GenericJDBCDAO<Vacina, Long> {
     @Override
     protected void setKeyInEntity(ResultSet rs, Vacina entity) throws SQLException {
         entity.setCodigo(rs.getLong(1));
+    }
+    public void inserirVacina(Vacina vacina){
+        try{
+
+            PreparedStatement sttmn = connection.prepareStatement(CREATE_QUERY);
+            sttmn.setString(1, vacina.getNome());
+            sttmn.setString(2, vacina.getDescricao());
+            sttmn.executeUpdate();
+        }catch(SQLException e){
+            showSQLException(e);
+        }
     }
 
     public void remover(Vacina vacina) {
