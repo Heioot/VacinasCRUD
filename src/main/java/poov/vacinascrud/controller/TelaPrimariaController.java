@@ -143,9 +143,9 @@ public class TelaPrimariaController implements Initializable {
                 List<Aplicacao> todas = dao.buscarAplicacoes();
 
                 Alert aviso = new Alert(AlertType.INFORMATION);
-                aviso.setTitle("Sucesso");
-                aviso.setHeaderText("Vacina aplicada com sucesso");
-                aviso.setContentText(slctPessoa.getNome()+" acabou de receber a "+slctVacina.getNome());
+                aviso.setTitle("Vacina aplicada com sucesso");
+                aviso.setHeaderText(slctPessoa.getNome()+" acabou de receber a "+slctVacina.getNome());
+                aviso.setContentText(slctVacina.getDescricao());
                 aviso.showAndWait();
                 for(Aplicacao a: todas){
                     System.out.println(a);
