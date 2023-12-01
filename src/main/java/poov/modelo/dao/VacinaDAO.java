@@ -84,7 +84,6 @@ public class VacinaDAO extends GenericJDBCDAO<Vacina, Long> {
             if(codigo != 0){
                 query += " and codigo = ?";
             }
-
             if(situacao == Situacao.ATIVO){
                 query += " and situacao = 'ATIVO'";
             }
@@ -101,7 +100,6 @@ public class VacinaDAO extends GenericJDBCDAO<Vacina, Long> {
                 statement.setLong(cursor,codigo);
                 cursor++;
             }
-
             ResultSet resultSet = statement.executeQuery();
             return toEntityList(resultSet);
         } catch (SQLException e) {

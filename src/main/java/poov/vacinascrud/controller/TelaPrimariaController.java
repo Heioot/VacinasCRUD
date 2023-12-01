@@ -2,7 +2,10 @@ package poov.vacinascrud.controller;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -24,15 +27,18 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import poov.modelo.Situacao;
 import poov.modelo.Vacina;
+import poov.modelo.dao.AplicacaoDAO;
 import poov.modelo.dao.ConexaoFactoryPostgreSQL;
+import poov.modelo.dao.PessoaDAO;
 import poov.modelo.dao.VacinaDAO;
 import poov.modelo.dao.core.DAO;
 import poov.modelo.dao.core.DAOFactory;
 import poov.vacinascrud.App;
-import poov.vacinascrud.modelo.Pessoa;
+// import poov.vacinascrud.modelo.Pessoa;
 import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
-import poov.vacinascrud.modelo.Pessoa;
+import poov.modelo.Aplicacao;
+import poov.modelo.Pessoa;
 
 public class TelaPrimariaController implements Initializable {
 
@@ -54,7 +60,7 @@ public class TelaPrimariaController implements Initializable {
     private TextField codigoPessoaField;
 
     @FXML
-    private TableColumn<?, ?> codigoTablePessoa;
+    private TableColumn<Pessoa, Long> codigoTablePessoa;
 
     @FXML
     private TableColumn<Vacina, Long> codigoTableVacina;
@@ -66,7 +72,7 @@ public class TelaPrimariaController implements Initializable {
     private TextField cpfPessoaField;
 
     @FXML
-    private TableColumn<?, ?> cpfTablePessoa;
+    private TableColumn<Pessoa, String> cpfTablePessoa;
 
     @FXML
     private Button criaraplicacaoPessoaButton;
@@ -87,13 +93,13 @@ public class TelaPrimariaController implements Initializable {
     private Button editarButton;
 
     @FXML
-    private TableColumn<?, ?> nascimentoTablePessoa;
+    private TableColumn<Pessoa, LocalDate > nascimentoTablePessoa;
 
     @FXML
     private TextField nomePessoaField;
 
     @FXML
-    private TableColumn<?, ?> nomeTablePessoa;
+    private TableColumn<Pessoa, String> nomeTablePessoa;
 
     @FXML
     private TableColumn<Vacina, String> nomeTableVacina;
@@ -121,6 +127,39 @@ public class TelaPrimariaController implements Initializable {
 
     @FXML
     void criaraplicacaoButtonClick(ActionEvent event) {
+        if(tabelaPessoa.getSelectionModel().getSelectedItem() == null ||tabelaVacina.getSelectionModel().getSelectedItem() == null){
+            Alert alerta = new Alert(AlertType.ERROR);
+            alerta.setTitle("Erro");
+            alerta.setHeaderText("Erro na Aplicação");
+            alerta.setContentText("Você deve selecionar uma Pessoa e uma Vacina para prosseguir com a aplicação");
+            alerta.showAndWait();
+        }else{
+            Pessoa slctPessoa = tabelaPessoa.getSelectionModel().getSelectedItem();
+            Vacina slctVacina = tabelaVacina.getSelectionModel().getSelectedItem();
+            try{
+                factory.abrirConexao();
+                AplicacaoDAO dao = factory.getDAO(AplicacaoDAO.class);
+                dao.novaAplicacao(slctPessoa, slctVacina);
+                List<Aplicacao> todas = dao.buscarAplicacoes();
+
+                Alert aviso = new Alert(AlertType.INFORMATION);
+                aviso.setTitle("Sucesso");
+                aviso.setHeaderText("Vacina aplicada com sucesso");
+                aviso.setContentText(slctPessoa.getNome()+" acabou de receber a "+slctVacina.getNome());
+                aviso.showAndWait();
+                for(Aplicacao a: todas){
+                    System.out.println(a);
+                }
+            }catch(SQLException e){
+                e.printStackTrace();
+                Alert alerta = new Alert(AlertType.ERROR);
+                alerta.setTitle("Erro");
+                alerta.setHeaderText("Sistema fora do ar!");
+                alerta.showAndWait();
+            }finally{
+                factory.fecharConexao();
+            }
+        }
 
     }
 
@@ -171,7 +210,49 @@ public class TelaPrimariaController implements Initializable {
 
     @FXML
     void pesquisarButtonPessoaClick(ActionEvent event) {
-
+        Pessoa nova = new Pessoa();
+        LocalDate ini = null;
+        LocalDate fim = null;
+        
+        if(!codigoPessoaField.getText().isBlank()){
+            nova.setCodigo(Long.parseLong(codigoPessoaField.getText()));
+        }else{
+            nova.setCodigo(null);
+        }
+        if(!nomePessoaField.getText().isBlank()){
+            nova.setNome(nomePessoaField.getText());
+        }else{
+            nova.setNome(null);
+        }
+        if(!cpfPessoaField.getText().isBlank()){
+            nova.setCpf(cpfPessoaField.getText());
+        }else{
+            nova.setCpf(null);
+        }
+        if(datePickerApartir.getValue() != null){
+            ini = datePickerApartir.getValue();
+        }else{
+            ini = null;
+        }
+        if(datePickerAte.getValue() != null){
+            fim = datePickerAte.getValue();
+        }else{
+            fim = null;
+        }
+        try{
+            factory.abrirConexao();
+            PessoaDAO dao2 = factory.getDAO(PessoaDAO.class);
+            List<Pessoa> disponiveis = dao2.buscarPorParametros(nova, ini, fim);
+            tabelaPessoa.getItems().clear();
+            tabelaPessoa.getItems().addAll(disponiveis);
+            for(Pessoa a : disponiveis){
+                // a.setData(  a.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+        }finally{
+            factory.fecharConexao();
+        }
     }
 
     @FXML
@@ -214,6 +295,12 @@ public class TelaPrimariaController implements Initializable {
             List<Vacina> vacinas = dao.findbyParameters(null, null, 0, Situacao.ATIVO);
             tabelaVacina.getItems().clear();
             tabelaVacina.getItems().addAll(vacinas);
+
+            PessoaDAO dao2 = factory.getDAO(PessoaDAO.class);
+            List<Pessoa> pessoas = dao2.buscarTodos();
+            tabelaPessoa.getItems().clear();
+            tabelaPessoa.getItems().addAll(pessoas);
+
         } finally {
             factory.fecharConexao();
         }
@@ -261,6 +348,12 @@ public class TelaPrimariaController implements Initializable {
         codigoTableVacina.setCellValueFactory(new PropertyValueFactory<Vacina, Long>("codigo"));
         nomeTableVacina.setCellValueFactory(new PropertyValueFactory<Vacina, String>("nome"));
         descricaoTableVacina.setCellValueFactory(new PropertyValueFactory<Vacina, String>("descricao"));
+
+        codigoTablePessoa.setCellValueFactory(new PropertyValueFactory<Pessoa, Long>("codigo"));
+        nomeTablePessoa.setCellValueFactory(new PropertyValueFactory<Pessoa, String>("nome"));
+        cpfTablePessoa.setCellValueFactory(new PropertyValueFactory<Pessoa, String>("Cpf"));
+        nascimentoTablePessoa.setCellValueFactory(new PropertyValueFactory<Pessoa, LocalDate>("Data"));
+
     }
 
     @Override
