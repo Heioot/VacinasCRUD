@@ -48,8 +48,10 @@ public class TelaSecundariaController implements Initializable{
             try {
                 factory.abrirConexao();
                 VacinaDAO dao = factory.getDAO(VacinaDAO.class);
-                List<Vacina> vacinas = dao.findAll();
-                cod = vacinas.get(vacinas.size()-1).getCodigo()+Long.parseLong("1");
+                List<Vacina> vacinas = dao.findAll();        
+                if (!vacinas.isEmpty()) {
+                    cod = vacinas.get(vacinas.size() - 1).getCodigo() + Long.parseLong("1");
+                }
             } finally {
                 factory.fecharConexao();
             }

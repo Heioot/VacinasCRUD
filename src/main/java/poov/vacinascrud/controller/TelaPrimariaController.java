@@ -52,7 +52,7 @@ public class TelaPrimariaController implements Initializable {
 
     public TelaPrimariaController() {
         System.out.println("TelaPrimariaController criado");
-        ConexaoFactoryPostgreSQL conexao = new ConexaoFactoryPostgreSQL("silly.db.elephantsql.com:5432/tplykbkp", "tplykbkp","yln0n1q5zcgZ3K58NWXeG2N2Gvl2MRKR");
+        ConexaoFactoryPostgreSQL conexao = new ConexaoFactoryPostgreSQL("localhost:5432/vacinascrud", "postgres","heitor6505");
         factory = new DAOFactory(conexao);
     }
 

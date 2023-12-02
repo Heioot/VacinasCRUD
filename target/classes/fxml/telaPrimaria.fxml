@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="564.0" prefWidth="1071.0" style="-fx-effect: 2;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="poov.vacinascrud.controller.TelaPrimariaController">
+   <children>
+      <Label layoutX="579.0" layoutY="86.0" text="Código:" />
+      <Label layoutX="582.0" layoutY="124.0" text="Nome:" />
+      <Label layoutX="564.0" layoutY="160.0" text="Descrição:" />
+      <TextField fx:id="codigoVacinaField" layoutX="624.0" layoutY="83.0" />
+      <TextField fx:id="nomeVacinaField" layoutX="624.0" layoutY="118.0" prefHeight="25.0" prefWidth="221.0" />
+      <TextField fx:id="descricaoVacinaField" layoutX="625.0" layoutY="155.0" prefHeight="98.0" prefWidth="221.0" />
+      <Button fx:id="pesquisarVacinaButton" layoutX="892.0" layoutY="164.0" mnemonicParsing="false" onAction="#pesquisarVacinaButtonClick" text="Pesquisar" />
+      <TableView fx:id="tabelaVacina" layoutX="563.0" layoutY="284.0" prefHeight="209.0" prefWidth="376.0">
+        <columns>
+          <TableColumn fx:id="codigoTableVacina" prefWidth="89.0" text="Código" />
+          <TableColumn fx:id="nomeTableVacina" prefWidth="100.0" text="Nome" />
+            <TableColumn fx:id="descricaoTableVacina" prefWidth="186.0" text="Descrição" />
+        </columns>
+      </TableView>
+      <Button fx:id="novaButton" layoutX="955.0" layoutY="312.0" mnemonicParsing="false" onAction="#novaButtonClick" prefHeight="25.0" prefWidth="92.0" text="Nova" />
+      <Button fx:id="editarButton" layoutX="955.0" layoutY="350.0" mnemonicParsing="false" onAction="#editarButtonClick" prefHeight="25.0" prefWidth="92.0" text="Editar" />
+      <Button fx:id="removerButton" layoutX="954.0" layoutY="391.0" mnemonicParsing="false" onAction="#removerButtonClick" prefHeight="25.0" prefWidth="92.0" text="Remover" />
+      <Label layoutX="751.0" layoutY="14.0" text="Vacina">
+         <font>
+            <Font size="24.0" />
+         </font></Label>
+      <Line endX="453.9000244140625" endY="18.700002670288086" layoutX="80.0" layoutY="15.0" startX="453.9000244140625" startY="455.3999938964844" />
+      <Label layoutX="72.0" layoutY="81.0" text="Código:" />
+      <Label layoutX="76.0" layoutY="118.0" text="Nome:" />
+      <TextField fx:id="codigoPessoaField" layoutX="118.0" layoutY="77.0" />
+      <TextField fx:id="nomePessoaField" layoutX="118.0" layoutY="114.0" prefHeight="26.0" prefWidth="260.0" />
+      <Label layoutX="85.0" layoutY="155.0" text="CPF:" />
+      <TextField fx:id="cpfPessoaField" layoutX="118.0" layoutY="147.0" />
+      <Button fx:id="pesquisarPessoaButton" layoutX="346.0" layoutY="184.0" mnemonicParsing="false" onAction="#pesquisarButtonPessoaClick" text="Pesquisar" />
+      <Label layoutX="43.0" layoutY="188.0" text="Nascimento:" />
+      <TableView fx:id="tabelaPessoa" layoutX="46.0" layoutY="286.0" prefHeight="210.0" prefWidth="459.0">
+         <columns>
+            <TableColumn fx:id="codigoTablePessoa" prefWidth="89.0" text="Código" />
+            <TableColumn fx:id="nomeTablePessoa" prefWidth="100.0" text="Nome" />
+            <TableColumn fx:id="cpfTablePessoa" prefWidth="128.8000030517578" text="cpf" />
+            <TableColumn fx:id="nascimentoTablePessoa" prefWidth="139.2" text="nascimento" />
+         </columns>
+      </TableView>
+      <Button fx:id="criaraplicacaoPessoaButton" layoutX="461.0" layoutY="516.0" mnemonicParsing="false" onAction="#criaraplicacaoButtonClick" prefHeight="26.0" prefWidth="143.0" text="Criar Aplicação" />
+      <DatePicker fx:id="datePickerApartir" layoutX="117.0" layoutY="215.0" onAction="#datePickerApartirClick" />
+      <DatePicker fx:id="datePickerAte" layoutX="117.0" layoutY="252.0" onAction="#datePickerAteClick" />
+      <Label layoutX="213.0" layoutY="15.0" text="Pessoa">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="49.0" layoutY="219.0" text="A partir de:" />
+      <Label layoutX="87.0" layoutY="256.0" text="Até:" />
+   </children>
+</AnchorPane>
