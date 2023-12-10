@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
@@ -19,6 +20,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -131,7 +133,7 @@ public class TelaPrimariaController implements Initializable {
             Alert alerta = new Alert(AlertType.ERROR);
             alerta.setTitle("Erro");
             alerta.setHeaderText("Erro na Aplicação");
-            alerta.setContentText("Você deve selecionar uma Pessoa e uma Vacina para prosseguir com a aplicação");
+            alerta.setContentText("Selecionae uma Pessoa e uma Vacina para realizar a aplicação");
             alerta.showAndWait();
         }else{
             Pessoa slctPessoa = tabelaPessoa.getSelectionModel().getSelectedItem();
@@ -184,6 +186,10 @@ public class TelaPrimariaController implements Initializable {
             Vacina selected = tabelaVacina.getSelectionModel().getSelectedItem();
             telaSecundariaController.setEditar(true);
             telaSecundariaController.setSelecionado(selected);
+            telaSecundariaController.getCodigoField().setDisable(true);
+
+
+            
 
             if (stageNova.getOwner() == null) {
                 stageNova.initOwner(((Button) event.getSource()).getScene().getWindow());
@@ -199,6 +205,7 @@ public class TelaPrimariaController implements Initializable {
         // mostrarNovaScene(event, "/fxml/telaSecundaria.fxml");
         telaSecundariaController.setEditar(false);
         telaSecundariaController.setSelecionado(new Vacina());
+        
         if (stageNova.getOwner() == null) {
             telaSecundariaController.setTitle("Nova Vacina");
             telaSecundariaController.setSelecionado(new Vacina());
@@ -258,23 +265,33 @@ public class TelaPrimariaController implements Initializable {
     @FXML
     void pesquisarVacinaButtonClick(ActionEvent event) throws SQLException {
         Vacina filtropesquisar = new Vacina();
-        
+    
         if (!codigoVacinaField.getText().isBlank()) {
+            if (!codigoVacinaField.getText().matches("\\d+")) {
+                Alert alert = new Alert(AlertType.WARNING);
+                alert.setTitle("Aviso");
+                alert.setHeaderText("O código deve conter apenas números!");
+                alert.showAndWait();
+                return;
+            }
+    
             filtropesquisar.setCodigo(Long.parseLong(codigoVacinaField.getText()));
         } else {
-            filtropesquisar.setCodigo(Long.parseLong("0"));
+            filtropesquisar.setCodigo(0L);
         }
+    
         if (!nomeVacinaField.getText().isBlank()) {
             filtropesquisar.setNome(nomeVacinaField.getText());
         } else {
             filtropesquisar.setNome(null);
         }
+    
         if (!descricaoVacinaField.getText().isBlank()) {
             filtropesquisar.setDescricao(descricaoVacinaField.getText());
         } else {
             filtropesquisar.setDescricao(null);
         }
-
+    
         try {
             factory.abrirConexao();
             VacinaDAO dao = factory.getDAO(VacinaDAO.class);
@@ -288,6 +305,7 @@ public class TelaPrimariaController implements Initializable {
             factory.fecharConexao();
         }
     }
+
     public void inicializarTableVacina() throws SQLException{
         try {
             factory.abrirConexao();
@@ -308,13 +326,19 @@ public class TelaPrimariaController implements Initializable {
     }
 
     @FXML
-    void removerButtonClick(ActionEvent event) throws IOException, SQLException {
-        if (tabelaVacina.getSelectionModel().isEmpty()) {
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Erro");
-            alert.setHeaderText("Você deve selecionar alguma vacina!");
-            alert.showAndWait();
-        } else {
+void removerButtonClick(ActionEvent event) throws IOException, SQLException {
+    if (tabelaVacina.getSelectionModel().isEmpty()) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Erro");
+        alert.setHeaderText("Você deve selecionar alguma vacina!");
+        alert.showAndWait();
+    } else {
+        Alert confirmacao = new Alert(AlertType.CONFIRMATION);
+        confirmacao.setTitle("Confirmação");
+        confirmacao.setHeaderText("Deseja realmente remover a vacina?");
+        Optional<ButtonType> result = confirmacao.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 factory.abrirConexao();
                 VacinaDAO dao = factory.getDAO(VacinaDAO.class);
@@ -325,9 +349,9 @@ public class TelaPrimariaController implements Initializable {
             } finally {
                 factory.fecharConexao();
             }
-
         }
     }
+}
 
     private void mostrarNovaScene(ActionEvent event, String sceneFile) throws IOException {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
