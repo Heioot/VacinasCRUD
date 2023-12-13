@@ -54,7 +54,7 @@ public class TelaPrimariaController implements Initializable {
 
     public TelaPrimariaController() {
         System.out.println("TelaPrimariaController criado");
-        ConexaoFactoryPostgreSQL conexao = new ConexaoFactoryPostgreSQL("localhost:5432/vacinascrud", "postgres","heitor6505");
+        ConexaoFactoryPostgreSQL conexao = new ConexaoFactoryPostgreSQL("silly.db.elephantsql.com:5432/tplykbkp", "tplykbkp","yln0n1q5zcgZ3K58NWXeG2N2Gvl2MRKR");
         factory = new DAOFactory(conexao);
     }
 
@@ -95,7 +95,7 @@ public class TelaPrimariaController implements Initializable {
     private Button editarButton;
 
     @FXML
-    private TableColumn<Pessoa, LocalDate > nascimentoTablePessoa;
+    private TableColumn<Pessoa, String > nascimentoTablePessoa;
 
     @FXML
     private TextField nomePessoaField;
@@ -253,7 +253,7 @@ public class TelaPrimariaController implements Initializable {
             tabelaPessoa.getItems().clear();
             tabelaPessoa.getItems().addAll(disponiveis);
             for(Pessoa a : disponiveis){
-                // a.setData(  a.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                System.out.println(a.toString());
             }
         }catch(SQLException e){
             e.printStackTrace();
@@ -376,7 +376,7 @@ void removerButtonClick(ActionEvent event) throws IOException, SQLException {
         codigoTablePessoa.setCellValueFactory(new PropertyValueFactory<Pessoa, Long>("codigo"));
         nomeTablePessoa.setCellValueFactory(new PropertyValueFactory<Pessoa, String>("nome"));
         cpfTablePessoa.setCellValueFactory(new PropertyValueFactory<Pessoa, String>("Cpf"));
-        nascimentoTablePessoa.setCellValueFactory(new PropertyValueFactory<Pessoa, LocalDate>("Data"));
+        nascimentoTablePessoa.setCellValueFactory(new PropertyValueFactory<Pessoa, String>("dataBrasil"));
 
     }
 

@@ -50,6 +50,7 @@ public class PessoaDAO extends GenericJDBCDAO<Pessoa, Long> {
         pessoa.setNome(resultSet.getString("nome"));
         pessoa.setCpf(resultSet.getString("cpf"));
         pessoa.setData(resultSet.getDate("data").toLocalDate());
+        pessoa.setDataBrasil(resultSet.getDate("data").toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         if (resultSet.getString("situacao").equals("ATIVO")) {
             pessoa.setSituacao(Situacao.ATIVO);
         } else {

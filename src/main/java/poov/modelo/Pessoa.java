@@ -8,8 +8,15 @@ public class Pessoa {
     private String cpf;
     private LocalDate data;
     private Situacao situacao;
+    private String dataBrasil;
 
 
+    public String getDataBrasil(){
+        return dataBrasil;
+    }
+    public void setDataBrasil(String dataBrasil){
+        this.dataBrasil = dataBrasil;
+    }
     public Long getCodigo() {
         return codigo;
     }
@@ -45,7 +52,7 @@ public class Pessoa {
     @Override
     public String toString() {
         return "Pessoa [codigo=" + codigo + ", nome=" + nome + ", cpf=" + cpf + ", data=" + data + ", situacao="
-        + situacao + "]";
+        + situacao +", dataBrasil= "+dataBrasil+ "]rober";
     }
     
 
