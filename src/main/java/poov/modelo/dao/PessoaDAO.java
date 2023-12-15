@@ -133,25 +133,25 @@ public class PessoaDAO extends GenericJDBCDAO<Pessoa, Long> {
             SQL_QUERY+=" AND data BETWEEN ? AND ?";
         }
         
-        int parametro = 1;
+        int cont = 1;
         try{
             PreparedStatement pstm = connection.prepareStatement(SQL_QUERY);
             if(pessoa.getCodigo() != null){
-                pstm.setLong(parametro, pessoa.getCodigo());
-                parametro++;
+                pstm.setLong(cont, pessoa.getCodigo());
+                cont++;
             }
             if(pessoa.getNome() != null){
-                pstm.setString(parametro,"%"+ pessoa.getNome().toLowerCase()+"%");
-                parametro++;
+                pstm.setString(cont,"%"+ pessoa.getNome().toLowerCase()+"%");
+                cont++;
             }
             if(pessoa.getCpf() != null){
-                pstm.setString(parametro,"%"+ pessoa.getCpf().toString()+"%");
-                parametro++;
+                pstm.setString(cont,"%"+ pessoa.getCpf().toString()+"%");
+                cont++;
             }
             if(ini != null && fim != null){
-                pstm.setDate(parametro,Date.valueOf(ini));
-                parametro++;
-                pstm.setDate(parametro,Date.valueOf(fim));
+                pstm.setDate(cont,Date.valueOf(ini));
+                cont++;
+                pstm.setDate(cont,Date.valueOf(fim));
             }
             ResultSet rSet = pstm.executeQuery();
             return toEntityList(rSet);

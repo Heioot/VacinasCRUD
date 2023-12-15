@@ -52,7 +52,7 @@ public class Pessoa {
     @Override
     public String toString() {
         return "Pessoa [codigo=" + codigo + ", nome=" + nome + ", cpf=" + cpf + ", data=" + data + ", situacao="
-        + situacao +", dataBrasil= "+dataBrasil+ "]rober";
+        + situacao +", dataBrasil= "+dataBrasil+ "]";
     }
     
 

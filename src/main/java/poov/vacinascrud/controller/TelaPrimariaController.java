@@ -54,7 +54,7 @@ public class TelaPrimariaController implements Initializable {
 
     public TelaPrimariaController() {
         System.out.println("TelaPrimariaController criado");
-        ConexaoFactoryPostgreSQL conexao = new ConexaoFactoryPostgreSQL("silly.db.elephantsql.com:5432/tplykbkp", "tplykbkp","yln0n1q5zcgZ3K58NWXeG2N2Gvl2MRKR");
+        ConexaoFactoryPostgreSQL conexao = new ConexaoFactoryPostgreSQL("localhost:5432/vacinascrud", "postgres","heitor6505");
         factory = new DAOFactory(conexao);
     }
 
@@ -95,6 +95,7 @@ public class TelaPrimariaController implements Initializable {
     private Button editarButton;
 
     @FXML
+    //private TableColumn<Pessoa, LocalDate > nascimentoTablePessoa;
     private TableColumn<Pessoa, String > nascimentoTablePessoa;
 
     @FXML
@@ -133,7 +134,7 @@ public class TelaPrimariaController implements Initializable {
             Alert alerta = new Alert(AlertType.ERROR);
             alerta.setTitle("Erro");
             alerta.setHeaderText("Erro na Aplicação");
-            alerta.setContentText("Selecionae uma Pessoa e uma Vacina para realizar a aplicação");
+            alerta.setContentText("Selecione uma Pessoa e uma Vacina para realizar a aplicação");
             alerta.showAndWait();
         }else{
             Pessoa slctPessoa = tabelaPessoa.getSelectionModel().getSelectedItem();
@@ -253,6 +254,7 @@ public class TelaPrimariaController implements Initializable {
             tabelaPessoa.getItems().clear();
             tabelaPessoa.getItems().addAll(disponiveis);
             for(Pessoa a : disponiveis){
+                // a.setData(  a.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
                 System.out.println(a.toString());
             }
         }catch(SQLException e){
@@ -264,40 +266,47 @@ public class TelaPrimariaController implements Initializable {
 
     @FXML
     void pesquisarVacinaButtonClick(ActionEvent event) throws SQLException {
-        Vacina filtropesquisar = new Vacina();
+        Vacina filtroPesquisar = new Vacina();
+    
+        if (!isApenasNumeros(codigoVacinaField.getText())) {
+            Alert alert = new Alert(AlertType.WARNING);
+            alert.setTitle("Aviso");
+            alert.setHeaderText("O código deve conter apenas números!");
+            alert.showAndWait();
+            return;
+        }
     
         if (!codigoVacinaField.getText().isBlank()) {
-            if (!codigoVacinaField.getText().matches("\\d+")) {
-                Alert alert = new Alert(AlertType.WARNING);
-                alert.setTitle("Aviso");
-                alert.setHeaderText("O código deve conter apenas números!");
-                alert.showAndWait();
-                return;
-            }
-    
-            filtropesquisar.setCodigo(Long.parseLong(codigoVacinaField.getText()));
+            filtroPesquisar.setCodigo(Long.parseLong(codigoVacinaField.getText()));
         } else {
-            filtropesquisar.setCodigo(0L);
+            filtroPesquisar.setCodigo(0L);
         }
     
         if (!nomeVacinaField.getText().isBlank()) {
-            filtropesquisar.setNome(nomeVacinaField.getText());
+            filtroPesquisar.setNome(nomeVacinaField.getText());
         } else {
-            filtropesquisar.setNome(null);
+            filtroPesquisar.setNome(null);
         }
     
         if (!descricaoVacinaField.getText().isBlank()) {
-            filtropesquisar.setDescricao(descricaoVacinaField.getText());
+            filtroPesquisar.setDescricao(descricaoVacinaField.getText());
         } else {
-            filtropesquisar.setDescricao(null);
+            filtroPesquisar.setDescricao(null);
         }
     
         try {
             factory.abrirConexao();
             VacinaDAO dao = factory.getDAO(VacinaDAO.class);
-            List<Vacina> vacinas = dao.findbyParameters(filtropesquisar.getNome(), filtropesquisar.getDescricao(), filtropesquisar.getCodigo(), filtropesquisar.getSituacao());
+            List<Vacina> vacinas = dao.findbyParameters(
+                    filtroPesquisar.getNome(),
+                    filtroPesquisar.getDescricao(),
+                    filtroPesquisar.getCodigo(),
+                    filtroPesquisar.getSituacao()
+            );
+    
             tabelaVacina.getItems().clear();
             tabelaVacina.getItems().addAll(vacinas);
+    
             for (Vacina vacina : vacinas) {
                 System.out.println(vacina);
             }
@@ -376,8 +385,8 @@ void removerButtonClick(ActionEvent event) throws IOException, SQLException {
         codigoTablePessoa.setCellValueFactory(new PropertyValueFactory<Pessoa, Long>("codigo"));
         nomeTablePessoa.setCellValueFactory(new PropertyValueFactory<Pessoa, String>("nome"));
         cpfTablePessoa.setCellValueFactory(new PropertyValueFactory<Pessoa, String>("Cpf"));
+        //nascimentoTablePessoa.setCellValueFactory(new PropertyValueFactory<Pessoa, LocalDate>("Data"));
         nascimentoTablePessoa.setCellValueFactory(new PropertyValueFactory<Pessoa, String>("dataBrasil"));
-
     }
 
     @Override
@@ -415,6 +424,15 @@ void removerButtonClick(ActionEvent event) throws IOException, SQLException {
         return !codigoVacinaField.getText().isBlank() &&
                 !nomeVacinaField.getText().isBlank() &&
                 !descricaoVacinaField.getText().isBlank();
+    }
+
+    private boolean isApenasNumeros(String texto) {
+        for (char caractere : texto.toCharArray()) {
+            if (!Character.isDigit(caractere)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
